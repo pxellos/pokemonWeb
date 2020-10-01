@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mappers.myMapper">
+
+<select id="playerRank" parameterType="String" resultType="model.Rank">
+	select rating from ranking where userinfo_id=#{id}
+</select>
+		<!-- 덱 삭제 -->
+<delete id="deleteDeck" parameterType="newModel.PokemonEntity">
+	delete from pokemon_entity where userinfo_id = #{userInfo_Id} and POKEMON_VARIETY_VARIETYNUMBER=#{pokemon_Variety_VarietyNumber}
+</delete>
+<!-- 돈과 관련된 것 feat.jun -->
+<insert id="congrat" parameterType="newModel.UserInfo">
+	insert into userinfo(usergold) values(#{userGold}) where id=#{id}
+</insert>
+<!-- 현질 후 삭감 -->
+<update id="deduct" parameterType="newModel.UserInfo">
+	update userinfo set usergold = #{userGold} where id=#{id}
+</update>
+<!-- 현재 금액 -->
+<select id="getMoney" parameterType="newModel.UserInfo" resultType="Integer">
+	select usergold from userinfo where id=#{id}
+</select>
+<!-- <update id="useMoney" parameterType="newModel.UserInfo","newModel.PokemonVariety"> -->
+<!-- 	update userinfo set usergold = usergold - -->
+<!-- 		(select price from pokemon_variety where varietyNumber=#{varietyNumber}) -->
+<!-- 	where id=#{id} -->
+<!-- </update> -->
+
+<!-- 머니 충전 -->
+<update id="chargeMoney" parameterType="newModel.UserInfo">
+	update userinfo set usergold = usergold + #{userGold} where id = #{id}
+</update>
+
+
+<!-- 덱 페이지  feat.wan-->
+	<select id="selectPokemonEntity"
+		resultType="newModel.PokemonEntity" parameterType="String">
+		select * from pokemon_entity where userinfo_id = #{id}
+	</select>
+	<select id="selectPokemonEntityList"
+		resultType="newModel.PokemonEntity" parameterType="String">
+		select * from pokemon_entity where userinfo_id = #{id}
+	</select>
+	<select id="getPokemonEntitiy"
+		resultType="newModel.PokemonEntity" parameterType="String">
+		select * from pokemon_entity where userinfo_id = #{id}
+	</select>
+	<select id="getUser2" resultType="newModel.UserInfo"
+		parameterType="String">
+		select id, username, password_2, phonenumber, address, email, job, usergold,
+		rating
+		from userinfo where id = #{id}
+	</select>
+	<select id="getUserInfo" resultType="newModel.UserInfo"
+		parameterType="String">
+		select * from userinfo where id = #{id}
+	</select>
+	<select id="selectUserInfoList" resultType="newModel.UserInfo">
+		select * from userinfo order by rating desc
+	</select>
+	
+<!-- 개체 스킬 세트 관련 메소드 feat.park-->
+	<select id="selectSkillModel" parameterType="String"
+		resultType="newModel.Skill">
+		select * from Skill where SkillNumber = #{i}
+	</select>
+	<select id="selectNormalSkill" parameterType="String"
+		resultType="newModel.Skill">
+		select * from Skill where SkillNumber = #{i}
+	</select>
+	<select id="selectTypeSkill" parameterType="String"
+		resultType="newModel.Skill">
+		select * from Skill where SkillNumber = #{i}
+	</select>
+	<select id="selectEntity" parameterType="String"
+		resultType="newModel.PokemonEntity">
+		select * from Pokemon_entity where UserInfo_Id=#{userId}
+	</select>
+
+<!-- 랭킹 메소드 feat.park-->
+	<select id="selectRanking" resultType="model.Rank">
+		select * from ranking order by rating desc
+	</select>
+	<select id="selectEntityList" parameterType="String"
+		resultType="newModel.PokemonEntity">
+		select * from Pokemon_entity where UserInfo_Id=#{userId}
+	</select>
+	<select id="deckList" parameterType="String"
+		resultType="Integer">
+		select Pokemon_Variety_VarietyNumber from Pokemon_entity where
+		UserInfo_Id=#{userId}
+	</select>
+	<select id="userList" resultType="String">
+		select Id from UserInfo
+	</select>
+	<insert id="insertRank" parameterType="String">
+		insert into ranking(userinfo_id, rating) values (#{userinfo_id}, 2000)
+	</insert>
+	<select id="selectRating" parameterType="String" resultType="Integer">
+		SELECT CASE WHEN MAX(userinfo_id) IS NULL THEN 0 ELSE 1 END User_exists
+		FROM ranking
+		WHERE userinfo_id = #{userId1}
+	</select>
+	<update id="updatePlusRank" parameterType="String">
+		update ranking set rating = rating + 25 where userinfo_id = #{userId}
+	</update>
+	<update id="updateMinusRank" parameterType="String">
+		update ranking set rating = rating * 0.95 where userinfo_id = #{userId}
+	</update>
+
+<!-- 참조 메소드 feat.duk-->
+	<select id="selectReplyPages" parameterType="Integer"
+		resultType="Integer">
+		select rn from (
+		select a.*, rownum rn from (
+		(
+		select * from image_writing
+		order by group_id desc, order_no asc
+		)a
+		)
+		) where writing_id = #{writing_id}
+	</select>
+	<select id="selectImageCount" resultType="Integer">
+		select count(*) from
+		image_writing
+	</select>
+	<update id="updateWritingInfo" parameterType="model.Writing">
+		update
+		image_writing set writer_name=#{writer_name},
+		email=#{email},
+		title=#{title}, content=#{content},
+		image_name=#{image_name} where
+		writing_id=#{writing_id}
+	</update>
+	<delete id="deleteWritingInfo" parameterType="Integer">
+		delete from
+		image_writing where writing_id=#{writing_id}
+	</delete>
+	<select id="getWritingInfo" parameterType="model.Condition"
+		resultType="model.Writing">
+		select * from (
+		select a.*, rownum rn from (
+		(
+		select * from image_writing
+		order by group_id desc, order_no asc
+		)a
+		)
+		) where rn between #{startRow} and #{endRow}
+	</select>
+	<select id="getWritingInfoById" resultType="model.Writing"
+		parameterType="Integer">
+		select * from image_writing where
+		writing_id=#{writing_id}
+	</select>
+	<insert id="insertWriting" parameterType="model.Writing">
+		insert into
+		image_writing values(#{writing_id},
+		#{group_id},#{order_no},#{parent_id},
+		#{register_date},#{writer_name},#{email},#{image_name},
+		#{password},#{title},#{content})
+	</insert>
+	<select id="getMaxWritingId" resultType="Integer">
+		select max(writing_id)
+		max_id from image_writing
+	</select>
+	<select id="getItemCount" resultType="Integer">
+		select count(*) as cnt from item_info
+	</select>
+	<insert id="putItem" parameterType="model.Item">
+		insert into item_info(code,name,price,info,origin)
+		values(#{code},#{name},#{price},#{info},#{origin})
+	</insert>
+	<select id="getItemList" resultType="model.Item"
+		parameterType="model.Condition">
+		select * from item_info
+	</select>
+	<select id="getBBSList" resultType="model.Bbs"
+		parameterType="model.Condition">
+		select seqno,title,id,content,bbs_date from
+		(
+		select a.*, rownum rn from
+		(
+		(select * from bbs order by seqno desc) a
+		)
+		)where rn between #{startRow} and #{endRow}
+	</select>
+	<select id="getBBSDetail" resultType="model.Bbs">
+		select * from bbs where seqno = #{seqno}
+	</select>
+	<select id="getBBSCount" resultType="Integer">
+		select count(*) as num from bbs
+	</select>
+	<select id="getMaxBbsId" resultType="Integer">
+		select max(seqno) as max_id from bbs
+	</select>
+	<insert id="putBBS" parameterType="model.Bbs">
+		insert into bbs values(#{seqno},#{title},#{content},#{id},
+		#{bbs_date})
+	</insert>
+	<select id="selectMaxGroupId" resultType="Integer">
+		select max(group_Id) max_id from image_writing
+	</select>
+	<update id="updateOrderNoReply" parameterType="model.Writing">
+		update image_writing set order_no = order_no + 1
+		where group_id = #{group_id} and order_no >= #{order_no}
+	</update>
+	
+<!-- PokemonDaoImpl 포켓몬 삽입 feat.jang-->
+	<insert id="putPokemon" parameterType="newModel.PokemonVariety">
+		insert into
+		pokemon_variety(varietynumber,imageroot,pokemonname,typeone,typetwo,varietyphysicalattack,varietyphysicaldefense,varietytypeattack,varietytypedefense,varietyspeed,varietyhealth,price)
+		values(#{varietynumber},#{imageroot},#{pokemonname},#{typeone},#{typetwo},#{varietyphysicalattack},#{varietyphysicaldefense},#{varietytypeattack},#{varietytypedefense},#{varietyspeed},#{varietyhealth},#{price})
+	</insert>
+	
+<!-- PokemonDaoImpl 포켓몬 리스트 전체 검색 feat.jang-->
+	<select id="getPokemonList" resultType="newModel.PokemonVariety"
+		parameterType="model.Condition">
+		select * from pokemon_variety order by varietynumber asc
+	</select>
+	<select id="getPokemonList100"
+		resultType="newModel.PokemonVariety" parameterType="model.Condition">
+		select * from pokemon_variety order by varietynumber desc
+	</select>
+	
+<!-- PokemonDaoImpl 포켓몬 수 검색 feat.jang-->
+	<select id="getPokemonCount" resultType="Integer">
+		select count(*) as cnt from pokemon_variety
+	</select>
+	
+<!-- LoginDaoImpl 동일한 계정의 갯수 검색 feat.jang-->
+	<select id="checkId" parameterType="String" resultType="Integer">
+		select count(*) as cnt from userinfo where id = #{id}
+	</select>
+	
+<!-- LoginDaoImpl 계정으로 암호 검색 feat.jang-->
+	<select id="getPassword" resultType="String"
+		parameterType="String">
+		select password_2 from userinfo where id = #{id}
+	</select>
+	
+<!-- LoginDaoImpl 계정으로 사용자 검색 feat.jang-->
+	<select id="getUser" resultType="newModel.UserInfo"
+		parameterType="String">
+		select id, username, password_2, phonenumber, address, email, job
+		from userinfo where id = #{id}
+	</select>
+	
+<!-- EntryDaoImpl 회원가입 정보입력 feat.jang-->
+	<insert id="putUser" parameterType="newModel.UserInfo">
+		insert into userinfo(id,username,password_2,
+		email,phonenumber,address,job,usergold) values(#{id},#{userName},
+		#{password},#{email},#{phoneNumber},#{address},#{job},5000)
+	</insert>
+	
+<!-- WishDaoImpl 장바구니 관련 feat.jang-->
+	<update id="updateCart" parameterType="newModel.WishItem">
+		update cart_new set
+		num=#{num} where code=#{code} and id=#{id}
+	</update>
+	
+<!-- WishDaoImpl 장바구니 관련 feat.jang-->
+	<delete id="deleteCart" parameterType="newModel.WishItem">
+		delete from cart_new where
+		code=#{code} and id=#{id}
+	</delete>
+	
+<!-- 포켓몬 개체 생성 feat.park -->
+	<delete id="deleteWish" parameterType="model.WishCart">
+		delete from cart_new where
+		code=#{code} and id=#{id}
+	</delete>
+	<insert id="insertEntity" parameterType="newModel.PokemonEntity">
+		insert into
+		Pokemon_entity values (#{entityNumber},#{userInfo_Id},#{pokemon_Variety_VarietyNumber},#{pokemonName},#{typeOne},#{typeTwo},#{EvolutionLevel},
+		#{EntityPhysicalAttack},#{EntityPhysicalDefense},#{EntityTypeAttack},#{EntityTypeDefense},#{EntitySpeed},#{EntityHealth},#{EntityTotal},
+		#{NormalSkill},#{TypeSkill},#{ImageRoot},#{Character})
+	</insert>
+	<select id="selectVariety" parameterType="Integer" resultType="newModel.PokemonVariety">
+		select * from
+		Pokemon_Variety where VarietyNumber=#{code}
+	</select>
+	<select id="countEntity" resultType="Integer">
+		select max(EntityNumber) from Pokemon_entity
+	</select>
+	
+<!-- WishDaoImpl 장바구니 관련 feat.jang-->
+	<insert id="insertCart" parameterType="newModel.WishItem">
+		insert into
+		cart_new(code,num,id) values(#{code},#{num},#{id})
+	</insert>
+	
+<!-- WishDaoImpl 장바구니 관련 feat.jang-->
+	<select id="selectCart" resultType="newModel.WishItem"
+		parameterType="String">
+		select cart_new.code code,cart_new.num num, p.price price,
+		p.pokemonname pokemonname, p.imageroot imageroot from cart_new
+		cart_new, pokemon_variety p
+		where cart_new.code = p.code and
+		cart_new.id = #{id}
+		<!-- where cart_new.code = i.varietynumber and cart_new.id = #{id} -->
+	</select>
+	
+<!-- WishDaoImpl 장바구니 관련 feat.jang-->
+	<select id="selectMaxCart" resultType="Integer">
+		select max(seqno) max_seqno from cart_new
+	</select>
+	
+											<!--  정렬 노가다 실시  feat.jang-->
+	<select id="getPokemonList1" resultType="newModel.PokemonVariety" parameterType="model.Condition">
+	select * from pokemon_variety order by varietyphysicalattack desc
+	</select>
+	
+	<select id="getPokemonList2" resultType="newModel.PokemonVariety" parameterType="model.Condition">
+	select * from pokemon_variety order by varietyphysicaldefense desc
+	</select>
+	
+	<select id="getPokemonList3" resultType="newModel.PokemonVariety" parameterType="model.Condition">
+	select * from pokemon_variety order by varietytypeattack desc
+	</select>
+	
+	<select id="getPokemonList4" resultType="newModel.PokemonVariety" parameterType="model.Condition">
+	select * from pokemon_variety order by varietytypedefense desc
+	</select>
+	
+	<select id="getPokemonList5" resultType="newModel.PokemonVariety" parameterType="model.Condition">
+	select * from pokemon_variety order by varietyspeed desc
+	</select>
+	
+	<select id="getPokemonList6" resultType="newModel.PokemonVariety" parameterType="model.Condition">
+	select * from pokemon_variety order by varietyhealth desc
+	</select>
+	
+	<select id="getPokemonList7" resultType="newModel.PokemonVariety" parameterType="model.Condition">
+	select * from pokemon_variety order by price desc
+	</select>
+	
+	<select id="getPokemonList8" resultType="newModel.PokemonVariety" parameterType="model.Condition">
+	select * from pokemon_variety order by varietytotal desc
+	</select>
+	
+	
+	<select id="getPokemonList11" resultType="newModel.PokemonVariety" parameterType="model.Condition">
+	select * from pokemon_variety order by varietyphysicalattack asc
+	</select>
+	
+	<select id="getPokemonList22" resultType="newModel.PokemonVariety" parameterType="model.Condition">
+	select * from pokemon_variety order by varietyphysicaldefense asc
+	</select>
+	
+	<select id="getPokemonList33" resultType="newModel.PokemonVariety" parameterType="model.Condition">
+	select * from pokemon_variety order by varietytypeattack asc
+	</select>
+	
+	<select id="getPokemonList44" resultType="newModel.PokemonVariety" parameterType="model.Condition">
+	select * from pokemon_variety order by varietytypedefense asc
+	</select>
+	
+	<select id="getPokemonList55" resultType="newModel.PokemonVariety" parameterType="model.Condition">
+	select * from pokemon_variety order by varietyspeed asc
+	</select>
+	
+	<select id="getPokemonList66" resultType="newModel.PokemonVariety" parameterType="model.Condition">
+	select * from pokemon_variety order by varietyhealth asc
+	</select>
+	
+	<select id="getPokemonList77" resultType="newModel.PokemonVariety" parameterType="model.Condition">
+	select * from pokemon_variety order by price asc
+	</select>
+	
+	<select id="getPokemonList88" resultType="newModel.PokemonVariety" parameterType="model.Condition">
+	select * from pokemon_variety order by varietytotal asc
+	</select>
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
